@@ -111,6 +111,7 @@ GameObject:
   - component: {fileID: 1234356886845188529}
   - component: {fileID: 928644795904880682}
   - component: {fileID: 2876299352310842195}
+  - component: {fileID: 9040814374436795305}
   m_Layer: 0
   m_Name: Turret
   m_TagString: Untagged
@@ -198,6 +199,33 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 2165579551946672802, guid: c085dfbe743d80740bc079e4ef4c1485, type: 3}
+--- !u!114 &9040814374436795305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4369611782509764271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 0
+  SyncPositionY: 0
+  SyncPositionZ: 0
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  InLocalSpace: 0
+  Interpolate: 0
+  CanCommitToTransform: 0
 --- !u!1 &8363260768634459874
 GameObject:
   m_ObjectHideFlags: 0
@@ -207,8 +235,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4040439527780244803}
+  - component: {fileID: 7144763174141316434}
   - component: {fileID: 5344714592708162520}
-  - component: {fileID: 32164257087294590}
+  - component: {fileID: 8881571685952083233}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -232,6 +261,33 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7144763174141316434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8363260768634459874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  InLocalSpace: 0
+  Interpolate: 0
+  CanCommitToTransform: 0
 --- !u!114 &5344714592708162520
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -248,7 +304,7 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &32164257087294590
+--- !u!114 &8881571685952083233
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -257,12 +313,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 8363260768634459874}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 643ad4f901a13014890cebb5c3ddfe4a, type: 3}
+  m_Script: {fileID: 11500000, guid: 6e771a041da9265418fb18136375e03e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Position:
-    m_InternalValue: {x: 0, y: 0, z: 0}
-  RedMaterial: {fileID: 2100000, guid: 95947a1e198c0d74d8c0e7399e976cd2, type: 2}
-  meshes:
-  - {fileID: 1313885265012083663}
-  - {fileID: 928644795904880682}
+  moveSpeed: 1
+  TurretTransform: {fileID: 6892404951917695894}
+  TurretOffset: {x: -90, y: 90, z: 0}
