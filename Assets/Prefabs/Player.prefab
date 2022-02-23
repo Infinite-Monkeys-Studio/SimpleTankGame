@@ -238,6 +238,7 @@ GameObject:
   - component: {fileID: 7144763174141316434}
   - component: {fileID: 5344714592708162520}
   - component: {fileID: 8881571685952083233}
+  - component: {fileID: 872241355753590070}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -319,3 +320,21 @@ MonoBehaviour:
   moveSpeed: 1
   TurretTransform: {fileID: 6892404951917695894}
   TurretOffset: {x: -90, y: 90, z: 0}
+--- !u!114 &872241355753590070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8363260768634459874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f54d59eaa0ded6409a89fb54592f464, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshes:
+  - {fileID: 1313885265012083663}
+  - {fileID: 928644795904880682}
+  TeamColors:
+  - {fileID: 2100000, guid: 42065697465389d4298a677abf82e57d, type: 2}
+  - {fileID: 2100000, guid: 95947a1e198c0d74d8c0e7399e976cd2, type: 2}

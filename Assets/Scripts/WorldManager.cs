@@ -14,8 +14,6 @@ public class WorldManager : MonoBehaviour
         else
         {
             StatusLabels();
-
-            SubmitNewPosition();
         }
 
         GUILayout.EndArea();
@@ -36,23 +34,5 @@ public class WorldManager : MonoBehaviour
         GUILayout.Label("Transport: " +
             NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetType().Name);
         GUILayout.Label("Mode: " + mode);
-    }
-
-    static void SubmitNewPosition()
-    {
-        if (GUILayout.Button(NetworkManager.Singleton.IsServer ? "Move" : "Request Position Change"))
-        {
-            if (NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsClient)
-            {
-                foreach (ulong uid in NetworkManager.Singleton.ConnectedClientsIds)
-                    NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(uid).GetComponent<PlayerManager>().Move();
-            }
-            else
-            {
-                var playerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
-                var player = playerObject.GetComponent<PlayerManager>();
-                player.Move();
-            }
-        }
     }
 }
