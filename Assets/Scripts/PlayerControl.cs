@@ -11,6 +11,10 @@ public class PlayerControl : NetworkBehaviour
     private Transform TurretTransform;
     [SerializeField]
     private Vector3 TurretOffset = new Vector3(-90, 90, 0);
+    [SerializeField]
+    private Transform muzzle;
+    [SerializeField]
+    private GameObject bullet;
 
     NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
     NetworkVariable<float> Rotation = new NetworkVariable<float>();
@@ -44,6 +48,7 @@ public class PlayerControl : NetworkBehaviour
 
     void UpdateClient()
     {
+        //do rotation
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         if(Physics.Raycast(ray, out hit))
@@ -58,7 +63,7 @@ public class PlayerControl : NetworkBehaviour
             UpdateClientRotationServerRpc(cachedRotation);
         }
 
-
+        //do movement
         float inputX = Input.GetAxis("Vertical");
         float inputY = Input.GetAxis("Horizontal");
 
@@ -70,6 +75,19 @@ public class PlayerControl : NetworkBehaviour
         {
             UpdateClientPositionServerRpc(cachedPosition);
         }
+
+        //do shooting
+        if(Input.GetButtonDown("Fire"))
+        {
+            ClientShootServerRpc();
+        }
+    }
+
+    [ServerRpc]
+    private void ClientShootServerRpc()
+    {
+        var bulletInstance = Instantiate(bullet, muzzle.position, muzzle.rotation);
+        bulletInstance.GetComponent<NetworkObject>().Spawn();
     }
 
     void UpdateServer()

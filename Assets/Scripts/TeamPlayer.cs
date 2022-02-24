@@ -39,10 +39,9 @@ public class TeamPlayer : NetworkBehaviour
 
         foreach (MeshRenderer mesh in meshes)
         {
-            Material[] newMaterials = (Material[]) mesh.materials.Clone();
+            Material[] newMaterials = mesh.materials;
             newMaterials[1] = TeamColors[TeamIndex.Value];
             mesh.materials = newMaterials;
-            //mesh.materials.SetValue(TeamColors[TeamIndex.Value], 1);
         }
     }
 }
