@@ -7,6 +7,8 @@ public class PlayerControl : NetworkBehaviour
 {
     [SerializeField]
     private float moveSpeed = 1;
+    [SerializeField] private float fireRate = 1;
+    [SerializeField] private HealthBar healthBar;
     [SerializeField]
     private Transform TurretTransform;
     [SerializeField]
@@ -20,20 +22,23 @@ public class PlayerControl : NetworkBehaviour
 
     NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
     NetworkVariable<float> Rotation = new NetworkVariable<float>();
+    NetworkVariable<int> Health = new NetworkVariable<int>();
+    NetworkVariable<bool> CanShoot = new NetworkVariable<bool>();
 
     private Vector3 cachedPosition = new Vector3();
     private float cachedRotation = 0;
+    private float lastShotTime;
 
     void Start()
     {
-        transform.position = GetRandomPositionOnPlane();
+        if (IsServer)
+        {
+            lastShotTime = Time.time;
+            CanShoot.Value = true;
+            Health.Value = 2;
+            healthBar.setHealth(Health.Value);
+        }
     }
-
-    public override void OnNetworkSpawn()
-    {
-        
-    }
-
 
     void Update()
     {
@@ -66,8 +71,8 @@ public class PlayerControl : NetworkBehaviour
         }
 
         //do movement
-        float inputX = Input.GetAxis("Vertical");
-        float inputY = Input.GetAxis("Horizontal");
+        float inputX = Input.GetAxis("Vertical") * moveSpeed;
+        float inputY = Input.GetAxis("Horizontal") * moveSpeed;
 
         Vector3 movement = new Vector3(inputX, 0, inputY);
 
@@ -79,7 +84,7 @@ public class PlayerControl : NetworkBehaviour
         }
 
         //do shooting
-        if(Input.GetButtonDown("Fire"))
+        if(Input.GetButtonDown("Fire") && CanShoot.Value)
         {
             ClientShootServerRpc();
             muzzleFlash.Play();
@@ -89,12 +94,35 @@ public class PlayerControl : NetworkBehaviour
     [ServerRpc]
     public void ClientShootServerRpc()
     {
-        var bulletInstance = Instantiate(bullet, muzzle.position, muzzle.rotation);
-        bulletInstance.GetComponent<NetworkObject>().Spawn();
+        if(CanShoot.Value)
+        {
+            CanShoot.Value = false;
+            lastShotTime = Time.time;
+            var bulletInstance = Instantiate(bullet, muzzle.position, muzzle.rotation);
+            bulletInstance.GetComponent<NetworkObject>().Spawn();
+        }
+    }
+
+    public void hit()
+    {
+        if(IsServer)
+        {
+            Health.Value -= 1;
+            Debug.Log($"Health {Health.Value}");
+            if (Health.Value <= 0)
+            {
+                //do death
+                Debug.Log("death");
+            }
+        }
     }
 
     void UpdateServer()
     {
+        if(Time.time - (1/fireRate) > lastShotTime)
+        {
+            CanShoot.Value = true;
+        }
         transform.position = Position.Value;
         TurretTransform.rotation = Quaternion.Euler(TurretOffset) * Quaternion.AngleAxis(Rotation.Value, Vector3.forward);
     }
@@ -114,5 +142,20 @@ public class PlayerControl : NetworkBehaviour
     static Vector3 GetRandomPositionOnPlane()
     {
         return new Vector3(Random.Range(-10f, 10f), 1f, Random.Range(-10f, 10f));
+    }
+
+    private void updateHealth(int previousValue, int newValue)
+    {
+        healthBar.setHealth(Health.Value);
+    }
+
+    private void OnEnable()
+    {
+        Health.OnValueChanged += updateHealth;
+    }
+
+    private void OnDisable()
+    {
+        Health.OnValueChanged -= updateHealth;
     }
 }

@@ -48,7 +48,15 @@ public class BulletControl : NetworkBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if(IsServer)
+        {
             alive.Value = false;
+            var player = other.GetComponentInParent<PlayerControl>();
+            if (player != null)
+            {
+                player.hit();
+            }
+        }
+            
     }
 
     private void doDeath()
