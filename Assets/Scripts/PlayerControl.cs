@@ -15,6 +15,8 @@ public class PlayerControl : NetworkBehaviour
     private Transform muzzle;
     [SerializeField]
     private GameObject bullet;
+    [SerializeField]
+    private ParticleSystem muzzleFlash;
 
     NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
     NetworkVariable<float> Rotation = new NetworkVariable<float>();
@@ -80,11 +82,12 @@ public class PlayerControl : NetworkBehaviour
         if(Input.GetButtonDown("Fire"))
         {
             ClientShootServerRpc();
+            muzzleFlash.Play();
         }
     }
 
     [ServerRpc]
-    private void ClientShootServerRpc()
+    public void ClientShootServerRpc()
     {
         var bulletInstance = Instantiate(bullet, muzzle.position, muzzle.rotation);
         bulletInstance.GetComponent<NetworkObject>().Spawn();

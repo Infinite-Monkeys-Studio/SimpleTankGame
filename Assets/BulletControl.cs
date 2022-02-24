@@ -7,14 +7,18 @@ public class BulletControl : NetworkBehaviour
 {
     [SerializeField] private float Speed = 1;
     [SerializeField] private float MaxLife = 5;
+    [SerializeField] private ParticleSystem explosion;
+    [SerializeField] private MeshRenderer shell;
 
     float life;
+    private NetworkVariable<bool> alive = new NetworkVariable<bool>(true);
 
     void Start()
     {
         if(IsServer)
         {
             life = MaxLife;
+            alive.Value = true;
         }
     }
 
@@ -22,18 +26,46 @@ public class BulletControl : NetworkBehaviour
     void Update()
     {
         if(IsServer)
-        {
-            transform.position += transform.forward * Speed;
-            life -= Time.deltaTime;
-            if(life <= 0)
+        {   
+            if(alive.Value)
             {
-                Destroy(gameObject);
+                life -= Time.deltaTime;
+                transform.position += transform.forward * Speed;
+                if (life <= 0) alive.Value = false;
+            } else
+            {
+                doDeath();
+            }
+        } else
+        {
+            if (!alive.Value)
+            {
+                doDeath();
             }
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        Destroy(gameObject);
+        if(IsServer)
+            alive.Value = false;
+    }
+
+    private void doDeath()
+    {
+        if (!explosion.isPlaying)
+        {
+            explosion.Play();
+            shell.enabled = false;
+        }
+
+        if(IsServer)
+        {
+            if (!explosion.IsAlive())
+            {
+                Destroy(gameObject);
+            }
+        }
+        
     }
 }
