@@ -5,27 +5,21 @@ using Unity.Netcode;
 
 public class PlayerControl : NetworkBehaviour
 {
-    [SerializeField]
-    private float moveSpeed = 1;
+    [SerializeField] private float moveSpeed = 1;
+    [SerializeField] private float collisionDistance = 5;
     [SerializeField] private float fireRate = 1;
     [SerializeField] private HealthBar healthBar;
-    [SerializeField]
-    private Transform TurretTransform;
-    [SerializeField]
-    private Vector3 TurretOffset = new Vector3(-90, 90, 0);
-    [SerializeField]
-    private Transform muzzle;
-    [SerializeField]
-    private GameObject bullet;
-    [SerializeField]
-    private ParticleSystem muzzleFlash;
+    [SerializeField] private Transform TurretTransform;
+    [SerializeField] private Vector3 TurretOffset = new Vector3(-90, 90, 0);
+    [SerializeField] private Transform muzzle;
+    [SerializeField] private GameObject bullet;
+    [SerializeField] private ParticleSystem muzzleFlash;
 
     NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
     NetworkVariable<float> Rotation = new NetworkVariable<float>();
     NetworkVariable<int> Health = new NetworkVariable<int>();
     NetworkVariable<bool> CanShoot = new NetworkVariable<bool>();
 
-    private Vector3 cachedPosition = new Vector3();
     private float cachedRotation = 0;
     private float lastShotTime;
 
@@ -75,16 +69,10 @@ public class PlayerControl : NetworkBehaviour
         float inputY = Input.GetAxis("Horizontal") * moveSpeed;
 
         Vector3 movement = new Vector3(inputX, 0, inputY);
-
-        cachedPosition += movement;
-
-        if(cachedPosition != Position.Value)
-        {
-            UpdateClientPositionServerRpc(cachedPosition);
-        }
+        UpdateClientPositionServerRpc(Position.Value + movement);
 
         //do shooting
-        if(Input.GetButtonDown("Fire") && CanShoot.Value)
+        if (Input.GetButtonDown("Fire") && CanShoot.Value)
         {
             ClientShootServerRpc();
             muzzleFlash.Play();
@@ -103,7 +91,7 @@ public class PlayerControl : NetworkBehaviour
         }
     }
 
-    public void hit()
+    public void HandleShotByBullet()
     {
         if(IsServer)
         {
@@ -123,8 +111,23 @@ public class PlayerControl : NetworkBehaviour
         {
             CanShoot.Value = true;
         }
-        transform.position = Position.Value;
         TurretTransform.rotation = Quaternion.Euler(TurretOffset) * Quaternion.AngleAxis(Rotation.Value, Vector3.forward);
+
+        
+        Vector3 requestedMove = Position.Value - transform.position;
+        Ray ray = new Ray(transform.position, requestedMove);
+        if(Physics.Raycast(ray, out RaycastHit hit))
+        {
+            Debug.DrawLine(transform.position, hit.point, Color.red);
+            if(requestedMove.magnitude > Vector3.Distance(transform.position, hit.point) - collisionDistance)
+            {
+                Debug.Log("too close");
+                Position.Value = transform.position;
+            } else
+            {
+                transform.position += requestedMove;
+            }
+        }
     }
 
     [ServerRpc]

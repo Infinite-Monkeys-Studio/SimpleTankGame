@@ -53,7 +53,7 @@ public class BulletControl : NetworkBehaviour
             var player = other.GetComponentInParent<PlayerControl>();
             if (player != null)
             {
-                player.hit();
+                player.HandleShotByBullet();
             }
         }
             
