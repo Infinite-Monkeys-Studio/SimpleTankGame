@@ -11,11 +11,6 @@ public class HealthBar : MonoBehaviour
 
     private int healthValue = 0;
 
-    void Start()
-    {
-       
-    }
-
     void Update()
     {
         transform.LookAt(Camera.main.transform);

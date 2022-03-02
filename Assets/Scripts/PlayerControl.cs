@@ -2,10 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using System.Linq;
 
 public class PlayerControl : NetworkBehaviour
 {
-    [SerializeField] private float moveSpeed = 1;
+    [SerializeField] private float maxVelocity = 2;
+    [SerializeField] private float moveForce = 1;
+    [SerializeField] private float wallForce = 10;
+    [SerializeField] private float dragForce = 0.2f;
     [SerializeField] private float collisionDistance = 5;
     [SerializeField] private float fireRate = 1;
     [SerializeField] private HealthBar healthBar;
@@ -16,12 +20,17 @@ public class PlayerControl : NetworkBehaviour
     [SerializeField] private ParticleSystem muzzleFlash;
 
     NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
-    NetworkVariable<float> Rotation = new NetworkVariable<float>();
+    NetworkVariable<Vector3> Velocity = new NetworkVariable<Vector3>();
+    
+    NetworkVariable<float> Rotation = new NetworkVariable<float>();    
+    
     NetworkVariable<int> Health = new NetworkVariable<int>();
     NetworkVariable<bool> CanShoot = new NetworkVariable<bool>();
 
     private float cachedRotation = 0;
     private float lastShotTime;
+    private Vector3 wallNormal = new Vector3();
+    private float wallSeparation = 0;
 
     void Start()
     {
@@ -65,10 +74,11 @@ public class PlayerControl : NetworkBehaviour
         }
 
         //do movement
-        float inputX = Input.GetAxis("Vertical") * moveSpeed;
-        float inputY = Input.GetAxis("Horizontal") * moveSpeed;
+        float inputX = Input.GetAxis("Vertical");
+        float inputY = Input.GetAxis("Horizontal");
 
         Vector3 movement = new Vector3(inputX, 0, inputY);
+        movement = movement.normalized * moveForce;
         UpdateClientPositionServerRpc(Position.Value + movement);
 
         //do shooting
@@ -101,12 +111,22 @@ public class PlayerControl : NetworkBehaviour
             {
                 //do death
                 Debug.Log("death");
+                //update score
+                int myTeamIndex = gameObject.GetComponent<TeamPlayer>().getTeamIndex();
+                ScoreKeeper.Singleton.TeamScored(myTeamIndex);
+
+                //respawn
+                Vector3 newSpawn = GetRandomPositionOnPlane();
+                Position.Value = newSpawn;
+                transform.position = newSpawn;
+                Health.Value = 2;
             }
         }
     }
 
     void UpdateServer()
     {
+        //do shooting
         if(Time.time - (1/fireRate) > lastShotTime)
         {
             CanShoot.Value = true;
@@ -114,26 +134,51 @@ public class PlayerControl : NetworkBehaviour
         TurretTransform.rotation = Quaternion.Euler(TurretOffset) * Quaternion.AngleAxis(Rotation.Value, Vector3.forward);
 
         
+        //do movement and collision
         Vector3 requestedMove = Position.Value - transform.position;
-        Ray ray = new Ray(transform.position, requestedMove);
-        if(Physics.Raycast(ray, out RaycastHit hit))
+        
+        if(wallSeparation > 0)
         {
-            Debug.DrawLine(transform.position, hit.point, Color.red);
-            if(requestedMove.magnitude > Vector3.Distance(transform.position, hit.point) - collisionDistance)
-            {
-                Debug.Log("too close");
-                Position.Value = transform.position;
-            } else
-            {
-                transform.position += requestedMove;
-            }
+            var dot = wallNormal * Vector3.Dot(requestedMove, wallNormal);
+            requestedMove -= dot;
+            transform.position += requestedMove;
+            transform.position += wallNormal * wallSeparation;
+            Position.Value = transform.position;
+            wallSeparation = 0;
+        } else
+        {
+            transform.position += Velocity.Value * Time.deltaTime;
         }
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        int best = 0;
+
+        for (int i = 1; i < collision.contactCount; i++)
+        {
+            if (collision.GetContact(best).separation < collision.GetContact(i).separation) best = i;
+        }
+
+        var contact = collision.GetContact(best);
+
+        var correction = contact.normal * -contact.separation;
+        wallNormal = wallNormal * wallSeparation + correction;
+        wallSeparation = wallNormal.magnitude;
+        wallNormal.Normalize();
     }
 
     [ServerRpc]
     void UpdateClientPositionServerRpc(Vector3 newClientPosition)
     {
         Position.Value = newClientPosition;
+    }
+
+    [ServerRpc]
+    void SetNewMovementForce(Vector3 newMovementForce)
+    {
+        Velocity.Value += newMovementForce;
+        Vector3.ClampMagnitude(Velocity.Value, maxVelocity);
     }
 
     [ServerRpc]

@@ -1,9 +1,12 @@
 using Unity.Netcode;
+using Unity.Netcode.Transports.UNET;
 using UnityEngine;
 using System.Collections;
 
 public class WorldManager : MonoBehaviour
 {
+    private string ipAddress = "127.0.0.1";
+
     void OnGUI()
     {
         GUILayout.BeginArea(new Rect(10, 10, 300, 300));
@@ -19,10 +22,16 @@ public class WorldManager : MonoBehaviour
         GUILayout.EndArea();
     }
 
-    static void StartButtons()
+    void StartButtons()
     {
         if (GUILayout.Button("Host")) NetworkManager.Singleton.StartHost();
-        if (GUILayout.Button("Client")) NetworkManager.Singleton.StartClient();
+        ipAddress = GUILayout.TextField(ipAddress);
+        if (GUILayout.Button("Client"))
+        {
+            var transport = NetworkManager.Singleton.GetComponent<UNetTransport>();
+            transport.ConnectAddress = ipAddress;
+            NetworkManager.Singleton.StartClient();
+        }
         //if (GUILayout.Button("Server")) NetworkManager.Singleton.StartServer();
     }
 
@@ -34,5 +43,9 @@ public class WorldManager : MonoBehaviour
         GUILayout.Label("Transport: " +
             NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetType().Name);
         GUILayout.Label("Mode: " + mode);
+        if(GUILayout.Button("Disconnect"))
+        {
+            NetworkManager.Singleton.Shutdown();
+        }
     }
 }

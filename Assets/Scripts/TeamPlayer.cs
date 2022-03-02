@@ -13,6 +13,16 @@ public class TeamPlayer : NetworkBehaviour
 
     NetworkVariable<byte> TeamIndex = new NetworkVariable<byte>();
 
+    public int getTeamIndex()
+    {
+        return (int)TeamIndex.Value;
+    }
+
+    private void Start()
+    {
+        OnTeamChange();
+    }
+
     [ServerRpc]
     internal void SetTeamServerRpc(byte newTeamIndex)
     {
@@ -33,10 +43,11 @@ public class TeamPlayer : NetworkBehaviour
 
     private void OnTeamChange(byte previousValue, byte newValue)
     {
-        if (!IsClient) { return; }
+        OnTeamChange();
+    }
 
-        Debug.Log($"picked team {TeamIndex.Value}");
-
+    private void OnTeamChange()
+    {
         foreach (MeshRenderer mesh in meshes)
         {
             Material[] newMaterials = mesh.materials;
