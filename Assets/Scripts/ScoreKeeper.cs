@@ -5,7 +5,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ScoreKeeper : MonoBehaviour
+public class ScoreKeeper : NetworkBehaviour
 {
     NetworkVariable<int> RedScore = new NetworkVariable<int>(0);
     NetworkVariable<int> BlueScore = new NetworkVariable<int>(0);
@@ -13,29 +13,38 @@ public class ScoreKeeper : MonoBehaviour
     [SerializeField] Text RedScoreText;
     [SerializeField] Text BlueScoreText;
 
-    private static ScoreKeeper scoreKeeperInstance;
-    public static ScoreKeeper Singleton { get
-        {
-            if(scoreKeeperInstance == null)
-            {
-                scoreKeeperInstance = new ScoreKeeper();
-            }
-            return scoreKeeperInstance;
-        } }
-
     public void TeamScored(int teamIndex)
     {
-        if (teamIndex == 0)
+        Debug.Log($"Team {teamIndex} scored");
+        
+        if(NetworkManager.Singleton.IsServer)
         {
-            RedScore.Value += 1;
+            if (teamIndex == 0)
+            {
+                RedScore.Value += 1;
+            }
+            else
+            {
+                BlueScore.Value += 1;
+            }
         }
-        else
-        {
-            BlueScore.Value += 1;
-        }
+
+        Debug.Log($"Red: {RedScore.Value}  Blue: {BlueScore.Value}");
     }
 
-    private void Update()
+    private void OnEnable()
+    {
+        RedScore.OnValueChanged += ScoreChanged;
+        BlueScore.OnValueChanged += ScoreChanged;
+    }
+
+    private void OnDisable()
+    {
+        RedScore.OnValueChanged -= ScoreChanged;
+        BlueScore.OnValueChanged -= ScoreChanged;
+    }
+
+    private void ScoreChanged(int previousValue, int newValue)
     {
         RedScoreText.text = RedScore.Value.ToString();
         BlueScoreText.text = BlueScore.Value.ToString();

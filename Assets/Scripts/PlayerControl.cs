@@ -28,6 +28,7 @@ public class PlayerControl : NetworkBehaviour
 
     private float cachedRotation = 0;
     private float lastShotTime;
+    private ScoreKeeper myScoreKeeper;
 
     void Start()
     {
@@ -37,6 +38,7 @@ public class PlayerControl : NetworkBehaviour
             CanShoot.Value = true;
             Health.Value = 2;
             healthBar.setHealth(Health.Value);
+            myScoreKeeper = FindObjectOfType<ScoreKeeper>();
         }
     }
 
@@ -165,7 +167,7 @@ public class PlayerControl : NetworkBehaviour
                 Debug.Log("death");
                 //update score
                 int myTeamIndex = gameObject.GetComponent<TeamPlayer>().getTeamIndex();
-                ScoreKeeper.Singleton.TeamScored(myTeamIndex);
+                myScoreKeeper.TeamScored(myTeamIndex);
 
                 //respawn
                 Vector3 newSpawn = GetRandomPositionOnPlane();

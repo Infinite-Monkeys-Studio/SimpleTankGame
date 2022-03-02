@@ -6,10 +6,8 @@ using UnityEngine;
 
 public class TeamPlayer : NetworkBehaviour
 {
-    [SerializeField]
-    private List<MeshRenderer> meshes;
-    [SerializeField]
-    private List<Material> TeamColors;
+    [SerializeField] private List<MeshRenderer> meshes;
+    [SerializeField] private List<Material> TeamColors;
 
     NetworkVariable<byte> TeamIndex = new NetworkVariable<byte>();
 
