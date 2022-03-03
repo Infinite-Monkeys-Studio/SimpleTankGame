@@ -3,14 +3,16 @@ using System;
 
 public class ConsoleToGUI : MonoBehaviour
 {
+    [SerializeField] float width = 540f;
+    [SerializeField] float height = 370f;
     [SerializeField] int kChars = 700;
     [SerializeField] bool doShow = true;
 
     string myLog = "*begin log";
     string filename = "";
 
-    void OnEnable() { Application.logMessageReceived += Log; }
-    void OnDisable() { Application.logMessageReceived -= Log; }
+    void OnEnable() { Application.logMessageReceivedThreaded += Log; }
+    void OnDisable() { Application.logMessageReceivedThreaded -= Log; }
     void Update() { if (Input.GetButtonDown("Console")) { doShow = !doShow; } }
 
     public void Log(string logString, string stackTrace, LogType type)
@@ -35,9 +37,8 @@ public class ConsoleToGUI : MonoBehaviour
     void OnGUI()
     {
         if (!doShow) { return; }
-        GUI.matrix = Matrix4x4.TRS(new Vector3(0, Screen.height - 500, 0),
-            Quaternion.identity,
-            new Vector3(Screen.width / 1200.0f, Screen.height / 800.0f, 1.0f));
-        GUI.TextArea(new Rect(10, 10, 540, 370), myLog);
+        GUI.matrix = Matrix4x4.TRS(new Vector3(Screen.width - width, Screen.height - height, 0),
+            Quaternion.identity, Vector3.one);
+        GUI.TextArea(new Rect(10, 10, width, height), myLog);
     }
 }

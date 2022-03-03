@@ -8,15 +8,20 @@ using System.Linq;
 
 public class UPNPControl : MonoBehaviour
 {
-    [SerializeField] private int defaultPort = 7777;
+    [SerializeField] private int port = 7777;
     [SerializeField] private Protocol transportProtocol = Protocol.Udp;
 
     private static IPAddress ExternalIPAddress;
     private INatDevice device;
+    private string textPort;
+    private bool show = true;
+
 
     // Start is called before the first frame update
     void Start()
     {
+        textPort = port.ToString();
+
         if (checkIfConnected())
         {
             Debug.Log("Connected.  Setting up UPnP");
@@ -30,21 +35,83 @@ public class UPNPControl : MonoBehaviour
         }
     }
 
+    void OnGUI()
+    {
+        GUILayout.BeginArea(new Rect(10, 210, 300, 300));
+        if(show)
+        {
+            if (GUILayout.Button("Hide")) show = false;
+            textPort = GUILayout.TextField(textPort);
+            if (GUILayout.Button("Open UPnP")) TryOpenUPNP();
+            if (GUILayout.Button("Close UPnP")) TryCloseUPNP();
+            if (GUILayout.Button("Netork Info")) LogNetworkInfo();
+        } else
+        {
+            if (GUILayout.Button("Show UPnP")) show = true;
+        }        
+        GUILayout.EndArea();
+    }
+
     private void DeviceFound(object sender, DeviceEventArgs args)
     {
         device = args.Device;
+        Debug.Log("UPnP Device found");        
+    }
 
-        if(device.GetSpecificMapping(transportProtocol, defaultPort).PublicPort == -1) //check that no map exists
+    private void TryCloseUPNP()
+    {
+        if (device == null)
         {
-            Debug.Log($"created map for port {defaultPort}");
-        } else if(device.GetSpecificMapping(transportProtocol, defaultPort).PublicPort == defaultPort)
-        {
-            Debug.Log($"port {defaultPort} already mapped, removing and replacing");
-            device.DeletePortMap(new Mapping(transportProtocol, defaultPort, defaultPort));
+            Debug.LogError("No UPNP device found!");
+            return;
         }
 
-        device.CreatePortMap(new Mapping(transportProtocol, defaultPort, defaultPort));
+        if (!int.TryParse(textPort, out port))
+        {
+            Debug.LogWarning("Could not parse port.  Using default port");
+        }
 
+        device.DeletePortMap(new Mapping(transportProtocol, port, port));
+        Debug.Log("Attempted to remove UPNP Entry");
+    }
+
+    private void TryOpenUPNP()
+    {
+        if(device == null)
+        {
+            Debug.LogError("No UPNP device found!");
+            return;
+        }
+
+        if(!int.TryParse(textPort, out port))
+        {
+            Debug.LogWarning("Could not parse port.  Using default port");
+        }
+
+        if (device.GetSpecificMapping(transportProtocol, port).PublicPort == -1) //check that no map exists
+        {
+            Debug.Log($"created map for port {port}");
+        }
+        else if (device.GetSpecificMapping(transportProtocol, port).PublicPort == port)
+        {
+            Debug.Log($"port {port} already mapped, removing and replacing");
+            device.DeletePortMap(new Mapping(transportProtocol, port, port));
+        }
+
+        device.CreatePortMap(new Mapping(transportProtocol, port, port));
+
+        if (device.GetSpecificMapping(transportProtocol, port).PublicPort == port)
+        {
+            Debug.Log($"Port {port} open");
+        }
+        else
+        {
+            Debug.LogError($"Port not open correctly");
+        }
+    }
+
+    private void LogNetworkInfo()
+    {
         ExternalIPAddress = device.GetExternalIP();
         Debug.Log($"Public IP is: {device.GetExternalIP()}");
         //Debug.Log($"Coded public ip is: {codeIPAddress(device.GetExternalIP())}");
@@ -65,7 +132,7 @@ public class UPNPControl : MonoBehaviour
     private void OnApplicationQuit()
     {
         if(device != null)
-            device.DeletePortMap(new Mapping(transportProtocol, defaultPort, defaultPort));
+            device.DeletePortMap(new Mapping(transportProtocol, port, port));
     }
 
     public static string GetPublicIPAddress()
