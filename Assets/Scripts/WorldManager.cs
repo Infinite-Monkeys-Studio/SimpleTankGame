@@ -5,7 +5,9 @@ using System.Collections;
 
 public class WorldManager : MonoBehaviour
 {
+    [SerializeField] private int defaultPort = 7777;
     private string ipAddress = "127.0.0.1";
+    private string port = "7777";
 
     void OnGUI()
     {
@@ -26,10 +28,20 @@ public class WorldManager : MonoBehaviour
     {
         if (GUILayout.Button("Host")) NetworkManager.Singleton.StartHost();
         ipAddress = GUILayout.TextField(ipAddress);
+        port = GUILayout.TextField(port);
         if (GUILayout.Button("Client"))
         {
+            int intPort;
+
+            if (!int.TryParse(port, out intPort))
+            {
+                intPort = defaultPort;
+            }
+
             var transport = NetworkManager.Singleton.GetComponent<UNetTransport>();
             transport.ConnectAddress = ipAddress;
+            transport.ConnectPort = intPort;
+            transport.ServerListenPort = intPort;
             NetworkManager.Singleton.StartClient();
         }
         //if (GUILayout.Button("Server")) NetworkManager.Singleton.StartServer();

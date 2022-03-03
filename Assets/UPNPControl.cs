@@ -10,23 +10,15 @@ public class UPNPControl : MonoBehaviour
 {
     [SerializeField] private int defaultPort = 7777;
     [SerializeField] private Protocol transportProtocol = Protocol.Udp;
-    [SerializeField] private TextAsset textJSON;
+
+    private static IPAddress ExternalIPAddress;
     private INatDevice device;
-
-    [System.Serializable]
-    private class WordList
-    {
-        public string[] codeWords;
-    }
-
-    private WordList wordList;
 
     // Start is called before the first frame update
     void Start()
     {
         if (checkIfConnected())
         {
-            wordList = JsonUtility.FromJson<WordList>(textJSON.text);
             Debug.Log("Connected.  Setting up UPnP");
             NatUtility.DeviceFound += DeviceFound;
             NatUtility.DeviceLost += DeviceLost;
@@ -53,7 +45,7 @@ public class UPNPControl : MonoBehaviour
 
         device.CreatePortMap(new Mapping(transportProtocol, defaultPort, defaultPort));
 
-
+        ExternalIPAddress = device.GetExternalIP();
         Debug.Log($"Public IP is: {device.GetExternalIP()}");
         //Debug.Log($"Coded public ip is: {codeIPAddress(device.GetExternalIP())}");
 
@@ -76,6 +68,12 @@ public class UPNPControl : MonoBehaviour
             device.DeletePortMap(new Mapping(transportProtocol, defaultPort, defaultPort));
     }
 
+    public static string GetPublicIPAddress()
+    {
+        if (ExternalIPAddress == null) return "No IP Available.";
+        return ExternalIPAddress.ToString();
+    }
+
     public static string GetLocalIPAddress()
     {
         var host = Dns.GetHostEntry(Dns.GetHostName());
@@ -92,34 +90,5 @@ public class UPNPControl : MonoBehaviour
     private bool checkIfConnected()
     {
         return System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable();
-    }
-
-    private string codeIPAddress(string address)
-    {
-        return codeIPAddress(IPAddress.Parse(address));
-    }
-
-    private string codeIPAddress(IPAddress address)
-    {
-        string output = "";
-        foreach (var item in address.GetAddressBytes())
-        {
-            output += wordList.codeWords[item] + " ";
-        }
-
-        return output.Trim();
-    }
-
-    private string decodeIPAddress(string words)
-    {
-        string address = "";
-        words = words.ToLower();
-        foreach (var item in words.Split(' '))
-        {
-            int index = wordList.codeWords.ToList().IndexOf(item);
-            address += index + ".";
-        }
-
-        return address.Remove(address.Length - 1, 1);
     }
 }
