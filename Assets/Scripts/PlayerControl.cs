@@ -57,6 +57,8 @@ public class PlayerControl : NetworkBehaviour
         {
             UpdateClient();
         }
+
+        healthBar.setHealth(Health.Value);
     }
 
     private void FixedUpdate()
@@ -212,7 +214,6 @@ public class PlayerControl : NetworkBehaviour
             }
         }
     }
-
 
     // ********** Helper functions
 

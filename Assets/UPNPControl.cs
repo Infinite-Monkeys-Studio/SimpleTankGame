@@ -16,7 +16,6 @@ public class UPNPControl : MonoBehaviour
     private string textPort;
     private bool show = true;
 
-
     // Start is called before the first frame update
     void Start()
     {
@@ -71,8 +70,13 @@ public class UPNPControl : MonoBehaviour
             Debug.LogWarning("Could not parse port.  Using default port");
         }
 
-        device.DeletePortMap(new Mapping(transportProtocol, port, port));
-        Debug.Log("Attempted to remove UPNP Entry");
+        if(device.GetSpecificMapping(transportProtocol, port).PublicPort == port)
+        {
+            Debug.Log("Port mapping found.  Removing...");
+            device.DeletePortMap(new Mapping(transportProtocol, port, port));
+        }
+        
+        Debug.Log("Could not find port mapping.");
     }
 
     private void TryOpenUPNP()
@@ -131,8 +135,7 @@ public class UPNPControl : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        if(device != null)
-            device.DeletePortMap(new Mapping(transportProtocol, port, port));
+        TryCloseUPNP();
     }
 
     public static string GetPublicIPAddress()

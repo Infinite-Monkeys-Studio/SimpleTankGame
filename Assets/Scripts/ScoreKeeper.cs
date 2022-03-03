@@ -32,6 +32,12 @@ public class ScoreKeeper : NetworkBehaviour
         Debug.Log($"Red: {RedScore.Value}  Blue: {BlueScore.Value}");
     }
 
+    private void Update()
+    {
+        RedScoreText.text = RedScore.Value.ToString();
+        BlueScoreText.text = BlueScore.Value.ToString();
+    }
+
     private void OnEnable()
     {
         RedScore.OnValueChanged += ScoreChanged;
@@ -46,7 +52,6 @@ public class ScoreKeeper : NetworkBehaviour
 
     private void ScoreChanged(int previousValue, int newValue)
     {
-        RedScoreText.text = RedScore.Value.ToString();
-        BlueScoreText.text = BlueScore.Value.ToString();
+        
     }
 }
