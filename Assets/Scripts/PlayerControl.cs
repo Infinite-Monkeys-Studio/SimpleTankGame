@@ -29,11 +29,15 @@ public class PlayerControl : NetworkBehaviour
     private float cachedRotation = 0;
     private float lastShotTime;
     private ScoreKeeper myScoreKeeper;
+    private Dictionary<int, Collision> ongoingCollisions = new Dictionary<int, Collision>();
+    private float startingY;
+
 
     void Start()
     {
         if (IsServer)
         {
+            startingY = transform.position.y;
             lastShotTime = Time.time;
             CanShoot.Value = true;
             Health.Value = 2;
@@ -53,6 +57,16 @@ public class PlayerControl : NetworkBehaviour
         {
             UpdateClient();
         }
+    }
+
+    private void FixedUpdate()
+    {
+        if(IsServer)
+        {
+            FixedUpdateServer();
+        }
+
+
     }
 
     void UpdateClient()
@@ -96,35 +110,69 @@ public class PlayerControl : NetworkBehaviour
             CanShoot.Value = true;
         }
         TurretTransform.rotation = Quaternion.Euler(TurretOffset) * Quaternion.AngleAxis(Rotation.Value, Vector3.forward);
-
-        //do movement
-        Vector3.ClampMagnitude(Velocity.Value, maxVelocity);
-        transform.position += Velocity.Value * Time.deltaTime;
-        Velocity.Value -= Velocity.Value * dragForce * Time.deltaTime;
     }
 
-    private void OnCollisionStay(Collision collision)
+    void FixedUpdateServer()
     {
-        if(IsServer)
+        Vector3.ClampMagnitude(Velocity.Value, maxVelocity);
+
+        foreach (var dict in ongoingCollisions)
         {
+            var collision = dict.Value;
+
+            foreach (var item in collision.contacts)
+            {
+                Debug.DrawLine(item.point, item.point + item.normal);
+            }
+
             var contact = MaxPoint(collision.contacts);
 
+            Debug.DrawLine(contact.point, contact.point + contact.normal, Color.red);
+
             //stop from moving into the wall more
-            Velocity.Value -= Vector3.Dot(contact.normal, Velocity.Value) * contact.normal;
+            float dot = Vector3.Dot(-contact.normal, Velocity.Value);
+            if(dot > 0) Velocity.Value += dot * contact.normal;
 
             //push out of the wall if inside
             var correction = contact.normal * -contact.separation;
-            Velocity.Value += correction.normalized * wallForce * Time.deltaTime;
+            Velocity.Value += correction.normalized * wallForce * Time.fixedDeltaTime;
+        }
+
+        //do movement
+        
+        transform.position += Velocity.Value * Time.fixedDeltaTime; 
+        Velocity.Value -= Velocity.Value * dragForce * Time.fixedDeltaTime;
+
+        ongoingCollisions.Clear();
+    }
+
+    /*private void OnCollisionExit(Collision collision)
+    {
+        if(IsServer)
+        {
+            int key = collision.gameObject.GetInstanceID();
+            if(ongoingCollisions.ContainsKey(key))
+            {
+                ongoingCollisions.Remove(key);
+            }
+        }
+    }*/
+
+    private void OnCollisionStay(Collision collision)
+    {
+        if (IsServer)
+        {
+            int key = collision.gameObject.GetInstanceID();
+            if (!ongoingCollisions.ContainsKey(key))
+            {
+              ongoingCollisions.Add(key, collision);
+            }
         }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if(IsServer)
-        {
-            var contact = MaxPoint(collision.contacts);
-            Velocity.Value -= Vector3.Dot(contact.normal, Velocity.Value) * contact.normal;
-        }
+        OnCollisionStay(collision);
     }
 
     // ********** Server RPCs
