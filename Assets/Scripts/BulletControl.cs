@@ -65,6 +65,7 @@ public class BulletControl : NetworkBehaviour
         {
             explosion.Play();
             shell.enabled = false;
+            gameObject.GetComponent<BoxCollider>().enabled = false;
         }
 
         if(IsServer)

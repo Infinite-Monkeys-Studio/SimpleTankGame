@@ -146,33 +146,21 @@ public class PlayerControl : NetworkBehaviour
         ongoingCollisions.Clear();
     }
 
-    /*private void OnCollisionExit(Collision collision)
-    {
-        if(IsServer)
-        {
-            int key = collision.gameObject.GetInstanceID();
-            if(ongoingCollisions.ContainsKey(key))
-            {
-                ongoingCollisions.Remove(key);
-            }
-        }
-    }*/
-
     private void OnCollisionStay(Collision collision)
+    {
+        OnCollisionEnter(collision);
+    }
+
+    private void OnCollisionEnter(Collision collision)
     {
         if (IsServer)
         {
             int key = collision.gameObject.GetInstanceID();
             if (!ongoingCollisions.ContainsKey(key))
             {
-              ongoingCollisions.Add(key, collision);
+                ongoingCollisions.Add(key, collision);
             }
         }
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        OnCollisionStay(collision);
     }
 
     // ********** Server RPCs

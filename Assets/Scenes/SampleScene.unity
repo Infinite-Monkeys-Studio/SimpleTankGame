@@ -486,7 +486,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 418320013}
-  - component: {fileID: 418320016}
   - component: {fileID: 418320014}
   - component: {fileID: 418320015}
   m_Layer: 0
@@ -538,22 +537,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RedScoreText: {fileID: 97858282}
   BlueScoreText: {fileID: 1215896295}
---- !u!114 &418320016
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 418320012}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 614545111
-  AlwaysReplicateAsRoot: 0
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!1 &526158870
 GameObject:
   m_ObjectHideFlags: 0
@@ -887,6 +870,10 @@ PrefabInstance:
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8431333489197844807, guid: ca1af00c220b95446af182207078bd66, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 100.00003
+      objectReference: {fileID: 0}
+    - target: {fileID: 8431333489197844807, guid: ca1af00c220b95446af182207078bd66, type: 3}
       propertyPath: m_LocalPosition.x
       value: -50
       objectReference: {fileID: 0}
@@ -1027,6 +1014,10 @@ PrefabInstance:
       value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 8431333489197844807, guid: ca1af00c220b95446af182207078bd66, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 100.00003
+      objectReference: {fileID: 0}
+    - target: {fileID: 8431333489197844807, guid: ca1af00c220b95446af182207078bd66, type: 3}
       propertyPath: m_LocalPosition.x
       value: 50
       objectReference: {fileID: 0}
@@ -1044,7 +1035,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8431333489197844807, guid: ca1af00c220b95446af182207078bd66, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 8431333489197844807, guid: ca1af00c220b95446af182207078bd66, type: 3}
       propertyPath: m_LocalRotation.y
