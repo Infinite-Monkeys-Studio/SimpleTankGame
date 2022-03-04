@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6980486103729803376}
   - component: {fileID: 9095005482742021282}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Point Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -106,7 +106,7 @@ GameObject:
   - component: {fileID: 989571885121008042}
   - component: {fileID: 2538189316313609404}
   - component: {fileID: 7035560295445243560}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Health Bar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -223,7 +223,7 @@ GameObject:
   - component: {fileID: 1300602514205284059}
   - component: {fileID: 1821066347142393064}
   - component: {fileID: 5364917598890023674}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Particle System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5088,7 +5088,7 @@ GameObject:
   - component: {fileID: 1313885265012083663}
   - component: {fileID: 1333186237309691710}
   - component: {fileID: 8271231689906575656}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5203,7 +5203,7 @@ GameObject:
   - component: {fileID: 1234356886845188529}
   - component: {fileID: 928644795904880682}
   - component: {fileID: 9040814374436795305}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Turret
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5314,7 +5314,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2546821753956670069}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Muzzle Position
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5346,7 +5346,7 @@ GameObject:
   - component: {fileID: 1484205410722398092}
   - component: {fileID: 5261242115765204392}
   - component: {fileID: 7561000005428211135}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Image (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5421,7 +5421,7 @@ GameObject:
   - component: {fileID: 6274931162802896249}
   - component: {fileID: 4487957533601134625}
   - component: {fileID: 4826186505353030877}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5501,7 +5501,7 @@ GameObject:
   - component: {fileID: 7675881192751975606}
   - component: {fileID: 6438148728714509454}
   - component: {fileID: 4157139420954594874}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5584,6 +5584,7 @@ MonoBehaviour:
   moveForce: 5
   wallForce: 60
   dragForce: 4
+  gravityForce: 30
   fireRate: 1
   healthBar: {fileID: 7035560295445243560}
   TurretTransform: {fileID: 6892404951917695894}

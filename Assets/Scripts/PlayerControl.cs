@@ -10,6 +10,7 @@ public class PlayerControl : NetworkBehaviour
     [SerializeField] private float moveForce = 1;
     [SerializeField] private float wallForce = 10;
     [SerializeField] private float dragForce = 0.2f;
+    [SerializeField] private float gravityForce = 30;
     [SerializeField] private float fireRate = 1;
     [SerializeField] private HealthBar healthBar;
     [SerializeField] private Transform TurretTransform;
@@ -118,6 +119,7 @@ public class PlayerControl : NetworkBehaviour
     {
         Vector3.ClampMagnitude(Velocity.Value, maxVelocity);
 
+        // apply collision forces
         foreach (var dict in ongoingCollisions)
         {
             var collision = dict.Value;
@@ -140,8 +142,12 @@ public class PlayerControl : NetworkBehaviour
             Velocity.Value += correction.normalized * wallForce * Time.fixedDeltaTime;
         }
 
+        //apply centering force
+        var g = new Vector3(transform.position.x, startingY, transform.position.z) - transform.position;
+        g *= gravityForce * Time.fixedDeltaTime;
+        Velocity.Value += g;
+
         //do movement
-        
         transform.position += Velocity.Value * Time.fixedDeltaTime; 
         Velocity.Value -= Velocity.Value * dragForce * Time.fixedDeltaTime;
 
