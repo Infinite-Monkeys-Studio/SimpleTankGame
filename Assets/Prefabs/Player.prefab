@@ -5581,10 +5581,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxVelocity: 1
-  moveForce: 5
+  moveForce: 3
   wallForce: 60
   dragForce: 4
-  gravityForce: 30
+  gravityForce: 60
   fireRate: 1
   healthBar: {fileID: 7035560295445243560}
   TurretTransform: {fileID: 6892404951917695894}

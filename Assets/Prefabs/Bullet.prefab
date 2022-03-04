@@ -222,7 +222,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0af163cfbc342a49987ecc974982051, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Speed: 5
+  Speed: 4
   MaxLife: 5
   explosion: {fileID: 7992238056695068065}
   shell: {fileID: 3326656665425108184}
