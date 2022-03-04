@@ -1,7 +1,7 @@
 using Unity.Netcode;
 using Unity.Netcode.Transports.UNET;
 using UnityEngine;
-using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class WorldManager : MonoBehaviour
 {
@@ -20,7 +20,7 @@ public class WorldManager : MonoBehaviour
         {
             StatusLabels();
         }
-
+        if (GUILayout.Button("Quit")) Application.Quit();
         GUILayout.EndArea();
     }
 
@@ -44,7 +44,7 @@ public class WorldManager : MonoBehaviour
             transport.ServerListenPort = intPort;
             NetworkManager.Singleton.StartClient();
         }
-        //if (GUILayout.Button("Server")) NetworkManager.Singleton.StartServer();
+        //
     }
 
     static void StatusLabels()
@@ -58,6 +58,7 @@ public class WorldManager : MonoBehaviour
         if(GUILayout.Button("Disconnect"))
         {
             NetworkManager.Singleton.Shutdown();
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 }

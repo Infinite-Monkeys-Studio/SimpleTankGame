@@ -5580,9 +5580,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e771a041da9265418fb18136375e03e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxVelocity: 3
+  maxVelocity: 1
   moveForce: 5
-  wallForce: 40
+  wallForce: 60
   dragForce: 4
   fireRate: 1
   healthBar: {fileID: 7035560295445243560}
